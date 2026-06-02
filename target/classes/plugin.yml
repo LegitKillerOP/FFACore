@@ -21,3 +21,9 @@ commands:
   kit:
     description: Select kit
     usage: /kit <kitname>
+  leaderboard:
+    description: Manage holographic leaderboards
+    usage: /leaderboard <add|movehere|reload|remove|list|update>
+  lb:
+    description: Short alias for /leaderboard
+    usage: /lb <add|movehere|reload|remove|list|update>

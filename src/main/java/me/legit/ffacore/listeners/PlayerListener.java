@@ -17,10 +17,12 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e){
         plugin.getPlayerDataManager().load(e.getPlayer().getUniqueId());
+        plugin.getLeaderboardManager().showAllTo(e.getPlayer());
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e){
+        plugin.getLeaderboardManager().removePlayer(e.getPlayer());
         plugin.getPlayerDataManager().unload(e.getPlayer().getUniqueId());
     }
 }

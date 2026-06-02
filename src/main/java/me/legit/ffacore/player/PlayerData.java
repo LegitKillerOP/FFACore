@@ -9,13 +9,16 @@ public class PlayerData {
     private int coins;
     private int xp;
 
-    public PlayerData() {
-        this.kills = 0;
-        this.deaths = 0;
-        this.killStreak = 0;
-        this.highestStreak = 0;
-        this.coins = 0;
-        this.xp = 0;
+    public PlayerData() {}
+
+    public PlayerData(int kills, int deaths, int killStreak, int highestStreak, int coins, int xp) {
+
+        this.kills = kills;
+        this.deaths = deaths;
+        this.killStreak = killStreak;
+        this.highestStreak = highestStreak;
+        this.coins = coins;
+        this.xp = xp;
     }
 
     public int getKills() {
@@ -26,7 +29,7 @@ public class PlayerData {
         kills++;
         killStreak++;
 
-        if(killStreak > highestStreak){
+        if (killStreak > highestStreak) {
             highestStreak = killStreak;
         }
     }
@@ -52,24 +55,24 @@ public class PlayerData {
         return coins;
     }
 
-    public void addCoins(int amount){
+    public void addCoins(int amount) {
         coins += amount;
-    }
-
-    public double getKDR(){
-
-        if(deaths == 0){
-            return kills;
-        }
-
-        return (double) kills / deaths;
     }
 
     public int getXp() {
         return xp;
     }
 
-    public void addXp(int amount){
+    public void addXp(int amount) {
         xp += amount;
+    }
+
+    public double getKDR() {
+
+        if (deaths == 0) {
+            return kills;
+        }
+
+        return (double) kills / deaths;
     }
 }
