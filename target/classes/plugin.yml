@@ -1,0 +1,23 @@
+name: FFACore
+version: '1.0-SNAPSHOT'
+main: me.legit.ffacore.FFACore
+softdepend: [ PlaceholderAPI ]
+depend: [WorldEdit, LuckPerms]
+authors: [ Legit ]
+description: FFA core plugin
+commands:
+  ffa:
+    description: FFACore admin command
+    usage: /ffa reload
+  spawn:
+    description: Teleport to spawn
+    usage: /spawn
+  setspawn:
+    description: Set spawn location
+    usage: /setspawn
+  arena:
+    description: Arena management
+    usage: /arena create <name>
+  kit:
+    description: Select kit
+    usage: /kit <kitname>

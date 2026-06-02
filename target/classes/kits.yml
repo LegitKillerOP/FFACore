@@ -1,0 +1,18 @@
+kits:
+
+  warrior:
+    permission: ffa.kit.warrior
+    icon: DIAMOND_SWORD
+
+    items:
+      - DIAMOND_SWORD
+      - MUSHROOM_SOUP:10
+
+  archer:
+    permission: ffa.kit.archer
+    icon: BOW
+
+    items:
+      - BOW
+      - ARROW:64
+      - MUSHROOM_SOUP:8
