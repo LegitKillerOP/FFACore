@@ -1,0 +1,5 @@
+mongodb:
+  # MongoDB connection URI
+  uri: "mongodb://localhost:27017"
+  # Database name
+  database: "minecraftservertest"

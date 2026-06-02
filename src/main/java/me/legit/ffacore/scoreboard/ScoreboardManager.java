@@ -33,18 +33,22 @@ public class ScoreboardManager {
                 DisplaySlot.SIDEBAR
         );
 
-        objective.setDisplayName(
-                color(
-                        plugin.getConfigManager()
-                                .getScoreboard()
-                                .get()
-                                .getString("title")
-                )
-        );
+        String title = plugin.getConfigManager()
+                .getScoreboard()
+                .get()
+                .getString("title");
+
+        if (title != null) {
+            objective.setDisplayName(color(title));
+        }
 
         PlayerData data =
                 plugin.getPlayerDataManager()
                         .get(player.getUniqueId());
+
+        if (data == null) {
+            data = new PlayerData();
+        }
 
         List<String> lines =
                 plugin.getConfigManager()
@@ -55,6 +59,11 @@ public class ScoreboardManager {
         int score = lines.size();
 
         for (String line : lines) {
+
+            if (line == null) {
+                score--;
+                continue;
+            }
 
             line = line
                     .replace("%kills%",
@@ -91,6 +100,10 @@ public class ScoreboardManager {
     }
 
     private String color(String text) {
+
+        if (text == null) {
+            return "";
+        }
 
         return ChatColor.translateAlternateColorCodes(
                 '&',

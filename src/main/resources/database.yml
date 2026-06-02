@@ -1,0 +1,8 @@
+# MongoDB Configuration
+# This file stores MongoDB-related settings
+
+# Collections used:
+# - players: Stores player data (kills, deaths, coins, xp, etc.)
+# - arenas: Stores arena configurations
+# - kits: Stores kit configurations
+# - leaderboards: Stores leaderboard definitions

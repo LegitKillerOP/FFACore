@@ -4,6 +4,9 @@ import me.legit.ffacore.arena.ArenaManager;
 import me.legit.ffacore.combat.CombatManager;
 import me.legit.ffacore.commands.*;
 import me.legit.ffacore.config.ConfigManager;
+import me.legit.ffacore.database.MongoDBHandler;
+import me.legit.ffacore.database.MongoDataStore;
+import me.legit.ffacore.database.MongoSaveTask;
 import me.legit.ffacore.hologram.HologramListener;
 import me.legit.ffacore.hologram.HologramManager;
 import me.legit.ffacore.kits.KitManager;
@@ -24,6 +27,8 @@ public class FFACore extends JavaPlugin {
 
     private static FFACore instance;
     private ConfigManager configManager;
+    private MongoDBHandler mongoDBHandler;
+    private MongoDataStore mongoDataStore;
     private PlayerDataManager playerDataManager;
     private SpawnManager spawnManager;
     private ArenaManager arenaManager;
@@ -37,6 +42,10 @@ public class FFACore extends JavaPlugin {
     public void onEnable() {
         instance = this;
         configManager = new ConfigManager(this);
+        mongoDBHandler = new MongoDBHandler(this);
+        mongoDBHandler.connect();
+        mongoDataStore = new MongoDataStore(this);
+        
         playerDataManager = new PlayerDataManager(this);
         spawnManager = new SpawnManager(this);
         arenaManager = new ArenaManager(this);
@@ -48,6 +57,7 @@ public class FFACore extends JavaPlugin {
 
         new ScoreboardTask(this).runTaskTimer(this, 20L, 20L);
         new LeaderboardTask(this).runTaskTimer(this, 20L, 200L);
+        new MongoSaveTask(this).runTaskTimer(this, 6000L, 6000L);  // Save every 5 minutes
 
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new SpawnListener(this), this);
@@ -70,6 +80,7 @@ public class FFACore extends JavaPlugin {
     public void onDisable() {
         playerDataManager.saveAll();
         configManager.saveAll();
+        mongoDBHandler.disconnect();
         log("FFACore disabled");
     }
 
@@ -78,7 +89,7 @@ public class FFACore extends JavaPlugin {
     }
 
     public void log(String message) {
-        getLogger().info("[FFACore] " + message);
+        getLogger().info(message);
     }
 
     public String getPrefix() {
@@ -87,6 +98,14 @@ public class FFACore extends JavaPlugin {
 
     public ConfigManager getConfigManager() {
         return configManager;
+    }
+
+    public MongoDBHandler getMongoDBHandler() {
+        return mongoDBHandler;
+    }
+
+    public MongoDataStore getMongoDataStore() {
+        return mongoDataStore;
     }
 
     public PlayerDataManager getPlayerDataManager() {
