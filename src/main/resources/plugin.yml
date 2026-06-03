@@ -21,6 +21,9 @@ commands:
   kit:
     description: Select kit
     usage: /kit <kitname>
+  kitadmin:
+    description: Admin kit GUI
+    usage: /kitadmin
   leaderboard:
     description: Manage holographic leaderboards
     usage: /leaderboard <add|movehere|reload|remove|list|update>

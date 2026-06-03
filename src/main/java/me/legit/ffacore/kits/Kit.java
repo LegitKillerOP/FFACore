@@ -7,7 +7,7 @@ import java.util.List;
 public class Kit {
     private final String name;
     private final String permission;
-    private final List<ItemStack> items;
+    private List<ItemStack> items;
 
     public Kit(String name, String permission,List<ItemStack> items){
         this.name = name;
@@ -25,5 +25,9 @@ public class Kit {
 
     public List<ItemStack> getItems() {
         return items;
+    }
+
+    public void setItems(List<ItemStack> items) {
+        this.items = items;
     }
 }

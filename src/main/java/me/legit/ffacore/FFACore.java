@@ -12,10 +12,8 @@ import me.legit.ffacore.hologram.HologramManager;
 import me.legit.ffacore.kits.KitManager;
 import me.legit.ffacore.leaderboard.LeaderboardManager;
 import me.legit.ffacore.leaderboard.LeaderboardTask;
-import me.legit.ffacore.listeners.CombatListener;
-import me.legit.ffacore.listeners.DeathListener;
-import me.legit.ffacore.listeners.PlayerListener;
-import me.legit.ffacore.listeners.SpawnListener;
+import me.legit.ffacore.listeners.*;
+import me.legit.ffacore.gui.GUIListener;
 import me.legit.ffacore.player.PlayerDataManager;
 import me.legit.ffacore.scoreboard.ScoreboardManager;
 import me.legit.ffacore.scoreboard.ScoreboardTask;
@@ -30,6 +28,8 @@ public class FFACore extends JavaPlugin {
     private MongoDBHandler mongoDBHandler;
     private MongoDataStore mongoDataStore;
     private PlayerDataManager playerDataManager;
+    private ChatListener chatListener;
+    private GUIListener guiListener;
     private SpawnManager spawnManager;
     private ArenaManager arenaManager;
     private KitManager kitManager;
@@ -47,6 +47,8 @@ public class FFACore extends JavaPlugin {
         mongoDataStore = new MongoDataStore(this);
         
         playerDataManager = new PlayerDataManager(this);
+        chatListener = new ChatListener(this);
+        guiListener = new GUIListener(this);
         spawnManager = new SpawnManager(this);
         arenaManager = new ArenaManager(this);
         kitManager = new KitManager(this);
@@ -60,6 +62,8 @@ public class FFACore extends JavaPlugin {
         new MongoSaveTask(this).runTaskTimer(this, 6000L, 6000L);  // Save every 5 minutes
 
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        getServer().getPluginManager().registerEvents(chatListener, this);
+        getServer().getPluginManager().registerEvents(guiListener, this);
         getServer().getPluginManager().registerEvents(new SpawnListener(this), this);
         getServer().getPluginManager().registerEvents(new CombatListener(this), this);
         getServer().getPluginManager().registerEvents(new DeathListener(this),this);
@@ -72,6 +76,7 @@ public class FFACore extends JavaPlugin {
         getCommand("kit").setExecutor(new KitCommand(this));
         getCommand("leaderboard").setExecutor(new LeaderboardCommand(this));
         getCommand("lb").setExecutor(new LeaderboardCommand(this));
+        getCommand("kitadmin").setExecutor(new KitAdminCommand(this));
 
         log("FFACore enabled");
     }
@@ -106,6 +111,14 @@ public class FFACore extends JavaPlugin {
 
     public MongoDataStore getMongoDataStore() {
         return mongoDataStore;
+    }
+
+    public ChatListener getChatListener() {
+        return chatListener;
+    }
+
+    public GUIListener getGuiListener() {
+        return guiListener;
     }
 
     public PlayerDataManager getPlayerDataManager() {
