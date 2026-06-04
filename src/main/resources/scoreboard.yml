@@ -10,3 +10,7 @@ lines:
   - "&fCoins: &6%coins%"
   - "&7&m----------------"
   - "&emc.server.net"
+
+tab:
+  header: "&6&lFFA"
+  footer: "&emc.server.net"

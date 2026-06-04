@@ -17,6 +17,7 @@ import me.legit.ffacore.gui.GUIListener;
 import me.legit.ffacore.player.PlayerDataManager;
 import me.legit.ffacore.scoreboard.ScoreboardManager;
 import me.legit.ffacore.scoreboard.ScoreboardTask;
+import me.legit.ffacore.scoreboard.TabManager;
 import me.legit.ffacore.spawn.SpawnManager;
 
 import org.bukkit.plugin.java.JavaPlugin;
@@ -35,6 +36,7 @@ public class FFACore extends JavaPlugin {
     private KitManager kitManager;
     private CombatManager combatManager;
     private ScoreboardManager scoreboardManager;
+    private TabManager tabManager;
     private LeaderboardManager leaderboardManager;
     private HologramManager hologramManager;
 
@@ -54,12 +56,14 @@ public class FFACore extends JavaPlugin {
         kitManager = new KitManager(this);
         combatManager = new CombatManager();
         scoreboardManager = new ScoreboardManager(this);
+        tabManager = new TabManager(this);
         leaderboardManager = new LeaderboardManager(this);
         hologramManager = new HologramManager(this);
 
         new ScoreboardTask(this).runTaskTimer(this, 20L, 20L);
         new LeaderboardTask(this).runTaskTimer(this, 20L, 200L);
         new MongoSaveTask(this).runTaskTimer(this, 6000L, 6000L);  // Save every 5 minutes
+        tabManager.startTabUpdater();
 
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(chatListener, this);
@@ -147,6 +151,10 @@ public class FFACore extends JavaPlugin {
 
     public LeaderboardManager getLeaderboardManager() {
         return leaderboardManager;
+    }
+
+    public TabManager getTabManager() {
+        return tabManager;
     }
 
     public HologramManager getHologramManager() {
