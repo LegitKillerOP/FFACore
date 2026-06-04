@@ -9,25 +9,14 @@ public class ScoreboardTask extends BukkitRunnable {
 
     private final FFACore plugin;
 
-    public ScoreboardTask(
-            FFACore plugin
-    ) {
-
+    public ScoreboardTask(FFACore plugin) {
         this.plugin = plugin;
-
     }
 
     @Override
     public void run() {
-
-        for (Player player :
-                Bukkit.getOnlinePlayers()) {
-
-            plugin.getScoreboardManager()
-                    .update(player);
-
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            plugin.getScoreboardManager().update(player);
         }
-
     }
-
 }

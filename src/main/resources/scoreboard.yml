@@ -1,16 +1,34 @@
-title: "&6&lFFA"
+title: "&b&lFFA"
 
 lines:
-  - "&7&m----------------"
-  - "&fKills: &a%kills%"
-  - "&fDeaths: &c%deaths%"
-  - "&fKDR: &e%kdr%"
-  - "&fStreak: &6%streak%"
-  - ""
-  - "&fCoins: &6%coins%"
-  - "&7&m----------------"
-  - "&emc.server.net"
+  - "&7&m--------------------"
+  - "&fPlayer: &b%player_name%"
+  - "&fRank: %luckperms_prefix%"
+  - "&7"
+  - "&b⚔ &fKills: &a%kills%"
+  - "&c☠ &fDeaths: &c%deaths%"
+  - "&e⚖ &fK/D: &e%kdr%"
+  - "&6⛃ &fCoins: &6%coins%"
+  - "&9📶 &fPing: &9%player_ping%ms"
+  - "&7"
+  - "&7mc.server.net"
+  - "&7&m--------------------"
 
 tab:
-  header: "&6&lFFA"
-  footer: "&emc.server.net"
+  header: |
+    &b&lFFA SERVER
+    &7Welcome, %luckperms_prefix%%player_name%
+    &7
+    &fKills: &a%kills%  &8|  &fDeaths: &c%deaths%
+
+  footer: |
+    &7
+    &fOnline: &a%online%
+    &fYour Rank: %luckperms_primary_group_name%
+    &7mc.server.net
+
+  name: "%luckperms_prefix% &7[%kills%] &f%player_name%"
+
+nametag:
+  prefix: "%luckperms_prefix%"
+  suffix: " &7| &a%kills%"
