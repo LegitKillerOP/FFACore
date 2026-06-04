@@ -2,6 +2,7 @@ package me.legit.ffacore;
 
 import me.legit.ffacore.arena.ArenaManager;
 import me.legit.ffacore.combat.CombatManager;
+import me.legit.ffacore.combat.CombatTask;
 import me.legit.ffacore.commands.*;
 import me.legit.ffacore.config.ConfigManager;
 import me.legit.ffacore.database.MongoDBHandler;
@@ -54,7 +55,7 @@ public class FFACore extends JavaPlugin {
         spawnManager = new SpawnManager(this);
         arenaManager = new ArenaManager(this);
         kitManager = new KitManager(this);
-        combatManager = new CombatManager();
+        combatManager = new CombatManager(15);
         scoreboardManager = new ScoreboardManager(this);
         tabManager = new TabManager(this);
         leaderboardManager = new LeaderboardManager(this);
@@ -64,6 +65,7 @@ public class FFACore extends JavaPlugin {
         new LeaderboardTask(this).runTaskTimer(this, 20L, 200L);
         new MongoSaveTask(this).runTaskTimer(this, 6000L, 6000L);  // Save every 5 minutes
         tabManager.startTabUpdater();
+        new CombatTask(this).runTaskTimer(this, 0L, 20L);
 
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(chatListener, this);
@@ -72,6 +74,7 @@ public class FFACore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new CombatListener(this), this);
         getServer().getPluginManager().registerEvents(new DeathListener(this),this);
         getServer().getPluginManager().registerEvents(new HologramListener(this),this);
+        getServer().getPluginManager().registerEvents(new ServerProtectionListener(this), this);
 
         getCommand("ffa").setExecutor(new FFACoreCommand(this));
         getCommand("spawn").setExecutor(new SpawnCommand(this));

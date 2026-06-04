@@ -1,35 +1,45 @@
 package me.legit.ffacore.combat;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CombatManager {
 
-    private final Map<UUID, Long> combatMap = new HashMap<>();
-    private final int combatTime = 15;
+    private final Map<UUID, Long> combatMap = new ConcurrentHashMap<>();
+    private final int combatTimeSeconds;
+
+    public CombatManager(int combatTimeSeconds) {
+        this.combatTimeSeconds = combatTimeSeconds;
+    }
 
     public void tag(UUID uuid) {
         combatMap.put(uuid, System.currentTimeMillis());
     }
 
     public boolean isTagged(UUID uuid) {
-        if (!combatMap.containsKey(uuid)) {
-            return false;
-        }
-        long time = combatMap.get(uuid);
-        return (System.currentTimeMillis() - time) < (combatTime * 1000);
+        Long time = combatMap.get(uuid);
+        if (time == null) return false;
+
+        return (System.currentTimeMillis() - time) < combatTimeSeconds * 1000L;
     }
 
     public int getRemaining(UUID uuid) {
-        if (!isTagged(uuid)) {
-            return 0;
-        }
-        long time = combatMap.get(uuid);
-        return combatTime - (int)((System.currentTimeMillis() - time) / 1000);
+        Long time = combatMap.get(uuid);
+        if (time == null) return 0;
+
+        long left = combatTimeSeconds - ((System.currentTimeMillis() - time) / 1000L);
+        return (int) Math.max(left, 0);
     }
 
     public void remove(UUID uuid) {
         combatMap.remove(uuid);
+    }
+
+    public void cleanup() {
+        long now = System.currentTimeMillis();
+        combatMap.entrySet().removeIf(entry ->
+                (now - entry.getValue()) >= combatTimeSeconds * 1000L
+        );
     }
 }

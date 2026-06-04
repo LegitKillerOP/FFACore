@@ -5,3 +5,93 @@ mongodb:
   database: "minecraftservertest"
 
 chat: "&8[FFA] %luckperms_prefix%%player_name% &8» &f{message}"
+
+
+# =========================================================
+# FFA CORE SERVER MODE CONFIGURATION
+# =========================================================
+
+server-mode:
+  # MODE TYPES:
+  # ONE_WORLD  = Everything happens in a single world (no separation)
+  # TWO_WORLD  = Separate lobby and arena worlds
+  # REGION     = PvP only inside a region in the same world
+  type: "TWO_WORLD"
+
+  # NOTE:
+  # - If you use TWO_WORLD → define lobby + arena worlds below
+  # - If you use REGION → configure region section below
+  # - Do NOT mix both logic at same time for best stability
+
+
+# =========================================================
+# WORLD SETTINGS (ONLY USED IN TWO_WORLD MODE)
+# =========================================================
+worlds:
+
+  # Lobby world = safe area (no PvP, no damage)
+  # Example: world_lobby, spawn_world
+  lobby: "world_lobby"
+
+  # Arena world = PvP enabled world
+  # Example: world_ffa, world_pvp
+  arena: "world"
+
+
+# =========================================================
+# REGION SETTINGS (ONLY USED IN REGION MODE)
+# =========================================================
+region:
+
+  # World where the PvP region exists
+  # Example: survival world or main world
+  world: "world"
+
+  # First corner of region (corner 1)
+  # Example: /setpos1 equivalent
+  min:
+    x: -100
+    y: 0
+    z: -100
+
+  # Second corner of region (corner 2)
+  # Example: /setpos2 equivalent
+  max:
+    x: 100
+    y: 255
+    z: 100
+
+
+# =========================================================
+# EXAMPLES FOR USERS
+# =========================================================
+
+# Example 1 (ONE WORLD MODE):
+# server-mode:
+#   type: "ONE_WORLD"
+#
+# → Everything is PvP world
+
+
+# Example 2 (TWO WORLD MODE):
+# server-mode:
+#   type: "TWO_WORLD"
+#
+# worlds:
+#   lobby: "lobby_world"
+#   arena: "ffa_world"
+#
+# → Lobby = safe zone
+# → Arena = PvP zone
+
+
+# Example 3 (REGION MODE):
+# server-mode:
+#   type: "REGION"
+#
+# region:
+#   world: "world"
+#   min: { x: -200, y: 0, z: -200 }
+#   max: { x: 200, y: 255, z: 200 }
+#
+# → Only inside region PvP works

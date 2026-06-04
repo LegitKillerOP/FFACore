@@ -1,8 +1,11 @@
 name: FFACore
 version: '${project.version}'
 main: me.legit.ffacore.FFACore
-softdepend: [ PlaceholderAPI ]
-depend: [WorldEdit, LuckPerms]
+softdepend:
+  - PlaceholderAPI
+  - WorldEdit
+  - WorldGuard
+  - LuckPerms
 authors: [ Legit ]
 description: FFA core plugin
 commands:

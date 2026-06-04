@@ -23,15 +23,22 @@ public class ConfigFile {
     }
 
     private void create() {
+        if (!plugin.getDataFolder().exists()) {
+            plugin.getDataFolder().mkdirs();
+        }
 
         file = new File(plugin.getDataFolder(), fileName);
 
         if (!file.exists()) {
-
-            file.getParentFile().mkdirs();
-
-            plugin.saveResource(fileName, false);
-
+            try {
+                plugin.saveResource(fileName, false);
+            } catch (IllegalArgumentException e) {
+                try {
+                    file.createNewFile();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
 
         config = YamlConfiguration.loadConfiguration(file);
