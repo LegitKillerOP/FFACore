@@ -21,13 +21,20 @@ import java.util.stream.Collectors;
 public class TabManager {
 
     private final FFACore plugin;
+    private BukkitRunnable task;
 
     public TabManager(FFACore plugin) {
         this.plugin = plugin;
     }
 
+    public void initPlayer(Player player) {
+        updateTab(player, 0);
+        updateNametag(player);
+    }
+
     public void startTabUpdater() {
-        new BukkitRunnable() {
+        stop();
+        task = new BukkitRunnable() {
             @Override
             public void run() {
 
@@ -45,7 +52,16 @@ public class TabManager {
                     updateNametag(player);
                 }
             }
-        }.runTaskTimer(plugin, 0L, 20L);
+        };
+
+        task.runTaskTimer(plugin, 0L, 20L);
+    }
+
+    public void stop() {
+        if (task != null) {
+            task.cancel();
+            task = null;
+        }
     }
 
     private void updateTab(Player player, int sortIndex) {
@@ -56,49 +72,50 @@ public class TabManager {
         int deaths = data != null ? data.getDeaths() : 0;
         int streak = data != null ? data.getKillStreak() : 0;
 
-        String header = getConfig("tab.header");
-        String footer = getConfig("tab.footer");
-        String tabName = getConfig("tab.name", "%player_name%");
+        String header = get("tab.header");
+        String footer = get("tab.footer");
+        String tabName = get("tab.name", "%player_name%");
 
-        header = applyPlaceholders(player, header, kills, deaths, streak);
-        footer = applyPlaceholders(player, footer, kills, deaths, streak);
-        tabName = applyPlaceholders(player, tabName, kills, deaths, streak);
+        header = apply(player, header, kills, deaths, streak);
+        footer = apply(player, footer, kills, deaths, streak);
+        tabName = apply(player, tabName, kills, deaths, streak);
 
         player.setPlayerListName(color(tabName));
 
         sendTab(player, color(header), color(footer));
     }
 
-    private String applyPlaceholders(Player player, String text, int kills, int deaths, int streak) {
+    public void removePlayer(Player player) {
+        Scoreboard board = player.getScoreboard();
 
+        if (board != null) {
+            Team team = board.getTeam("ffa_" + player.getEntityId());
+            if (team != null) {
+                team.unregister();
+            }
+        }
+    }
+
+    private String apply(Player p, String text, int k, int d, int s) {
         if (text == null) return "";
 
-        text = text
-                .replace("%player%", player.getName())
-                .replace("%kills%", String.valueOf(kills))
-                .replace("%deaths%", String.valueOf(deaths))
-                .replace("%streak%", String.valueOf(streak))
+        text = text.replace("%player%", p.getName())
+                .replace("%kills%", String.valueOf(k))
+                .replace("%deaths%", String.valueOf(d))
+                .replace("%streak%", String.valueOf(s))
                 .replace("%online%", String.valueOf(Bukkit.getOnlinePlayers().size()));
 
-        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            text = PlaceholderAPI.setPlaceholders(player, text);
-        }
-
-        return text;
+        return Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")
+                ? PlaceholderAPI.setPlaceholders(p, text)
+                : text;
     }
 
-    private String getConfig(String path) {
-        return plugin.getConfigManager()
-                .getScoreboard()
-                .get()
-                .getString(path, "");
+    private String get(String path) {
+        return plugin.getConfigManager().getScoreboard().get().getString(path, "");
     }
 
-    private String getConfig(String path, String def) {
-        return plugin.getConfigManager()
-                .getScoreboard()
-                .get()
-                .getString(path, def);
+    private String get(String path, String def) {
+        return plugin.getConfigManager().getScoreboard().get().getString(path, def);
     }
 
     private String color(String text) {
@@ -126,28 +143,31 @@ public class TabManager {
     }
 
     private void updateNametag(Player player) {
+        Scoreboard board = player.getScoreboard();
 
-        Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
+        if (board == null || board == Bukkit.getScoreboardManager().getMainScoreboard()) {
+            board = Bukkit.getScoreboardManager().getNewScoreboard();
+            player.setScoreboard(board);
+        }
 
         String teamName = "ffa_" + player.getEntityId();
+        if (teamName.length() > 16) {
+            teamName = teamName.substring(0, 16);
+        }
 
         Team team = board.getTeam(teamName);
-
         if (team == null) {
             team = board.registerNewTeam(teamName);
         }
 
-        String prefix = getConfig("nametag.prefix");
-        String suffix = getConfig("nametag.suffix");
-
         PlayerData data = plugin.getPlayerDataManager().get(player.getUniqueId());
 
-        int kills = data != null ? data.getKills() : 0;
-        int deaths = data != null ? data.getDeaths() : 0;
-        int streak = data != null ? data.getKillStreak() : 0;
+        int k = data != null ? data.getKills() : 0;
+        int d = data != null ? data.getDeaths() : 0;
+        int s = data != null ? data.getKillStreak() : 0;
 
-        prefix = applyPlaceholders(player, prefix, kills, deaths, streak);
-        suffix = applyPlaceholders(player, suffix, kills, deaths, streak);
+        String prefix = apply(player, get("nametag.prefix"), k, d, s);
+        String suffix = apply(player, get("nametag.suffix"), k, d, s);
 
         prefix = color(prefix);
         suffix = color(suffix);

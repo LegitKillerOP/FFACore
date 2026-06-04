@@ -23,7 +23,14 @@ public class FFACoreCommand implements CommandExecutor {
 
         if(args[0].equalsIgnoreCase("reload")){
             plugin.getConfigManager().reloadAll();
-            sender.sendMessage(plugin.getPrefix() + ChatColor.GREEN + "FFACore configs reloaded.");
+
+            plugin.getTabManager().startTabUpdater(); // now safe (it stops old task)
+
+            plugin.getServer().getOnlinePlayers().forEach(p -> {
+                plugin.getScoreboardManager().update(p);
+            });
+
+            sender.sendMessage(plugin.getPrefix() + ChatColor.GREEN + "Reloaded successfully.");
             return true;
         }
 

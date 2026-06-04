@@ -2,17 +2,145 @@ kits:
 
   warrior:
     permission: ffa.kit.warrior
-    icon: DIAMOND_SWORD
-
     items:
-      - DIAMOND_SWORD
-      - MUSHROOM_SOUP:10
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: DIAMOND_SWORD
+        enchants:
+          DAMAGE_ALL: 5
+          DURABILITY: 3
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: FISHING_ROD
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: BOW
+        enchants:
+          ARROW_DAMAGE: 3
+          DURABILITY: 3
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: ARROW
+        amount: 32
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: GOLDEN_APPLE
+        amount: 8
+
+      # ARMOR SET
+      - ==: org.bukkit.inventory.ItemStack
+        type: DIAMOND_HELMET
+        enchants:
+          PROTECTION_ENVIRONMENTAL: 4
+          DURABILITY: 3
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: DIAMOND_CHESTPLATE
+        enchants:
+          PROTECTION_ENVIRONMENTAL: 4
+          DURABILITY: 3
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: DIAMOND_LEGGINGS
+        enchants:
+          PROTECTION_ENVIRONMENTAL: 4
+          DURABILITY: 3
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: DIAMOND_BOOTS
+        enchants:
+          PROTECTION_ENVIRONMENTAL: 4
+          DURABILITY: 3
+
 
   archer:
     permission: ffa.kit.archer
-    icon: BOW
-
     items:
-      - BOW
-      - ARROW:64
-      - MUSHROOM_SOUP:8
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: BOW
+        enchants:
+          ARROW_DAMAGE: 5
+          ARROW_KNOCKBACK: 1
+          DURABILITY: 3
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: ARROW
+        amount: 64
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: FISHING_ROD
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: DIAMOND_SWORD
+        enchants:
+          DAMAGE_ALL: 3
+          DURABILITY: 2
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: GOLDEN_APPLE
+        amount: 5
+
+      # LIGHT ARMOR (mobility style)
+      - ==: org.bukkit.inventory.ItemStack
+        type: LEATHER_HELMET
+        enchants:
+          PROTECTION_PROJECTILE: 3
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: LEATHER_CHESTPLATE
+        enchants:
+          PROTECTION_PROJECTILE: 3
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: LEATHER_LEGGINGS
+        enchants:
+          PROTECTION_PROJECTILE: 3
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: LEATHER_BOOTS
+        enchants:
+          PROTECTION_PROJECTILE: 3
+
+
+  tank:
+    permission: ffa.kit.tank
+    items:
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: DIAMOND_SWORD
+        enchants:
+          DAMAGE_ALL: 4
+          DURABILITY: 3
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: FISHING_ROD
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: GOLDEN_APPLE
+        amount: 10
+
+      # HIGH DEFENSE ARMOR
+      - ==: org.bukkit.inventory.ItemStack
+        type: DIAMOND_HELMET
+        enchants:
+          PROTECTION_ENVIRONMENTAL: 5
+          DURABILITY: 3
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: DIAMOND_CHESTPLATE
+        enchants:
+          PROTECTION_ENVIRONMENTAL: 5
+          DURABILITY: 3
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: DIAMOND_LEGGINGS
+        enchants:
+          PROTECTION_ENVIRONMENTAL: 5
+          DURABILITY: 3
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: DIAMOND_BOOTS
+        enchants:
+          PROTECTION_ENVIRONMENTAL: 5
+          DURABILITY: 3

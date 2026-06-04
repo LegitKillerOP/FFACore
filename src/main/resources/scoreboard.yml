@@ -1,15 +1,13 @@
-title: "&b&lFFA"
+title: "&b&lFFA &7• &fPvP"
 
 lines:
   - "&7&m--------------------"
   - "&fPlayer: &b%player_name%"
   - "&fRank: %luckperms_prefix%"
   - "&7"
-  - "&b⚔ &fKills: &a%kills%"
-  - "&c☠ &fDeaths: &c%deaths%"
-  - "&e⚖ &fK/D: &e%kdr%"
-  - "&6⛃ &fCoins: &6%coins%"
-  - "&9📶 &fPing: &9%player_ping%ms"
+  - "&bStats"
+  - "&7Kills: &a%kills%"
+  - "&7Coins: &6%coins%"
   - "&7"
   - "&7mc.server.net"
   - "&7&m--------------------"
@@ -17,17 +15,16 @@ lines:
 tab:
   header: |
     &b&lFFA SERVER
-    &7Welcome, %luckperms_prefix%%player_name%
-    &7
-    &fKills: &a%kills%  &8|  &fDeaths: &c%deaths%
+    &7Welcome back, %player_name%
+    &7Fight. Improve. Dominate.
 
   footer: |
     &7
     &fOnline: &a%online%
-    &fYour Rank: %luckperms_primary_group_name%
+    &fRank: %luckperms_prefix%
     &7mc.server.net
 
-  name: "%luckperms_prefix% &7[%kills%] &f%player_name%"
+  name: "%luckperms_prefix%%player_name% &7[%kills%]"
 
 nametag:
   prefix: "%luckperms_prefix%"

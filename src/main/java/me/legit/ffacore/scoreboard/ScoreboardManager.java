@@ -36,45 +36,42 @@ public class ScoreboardManager {
             obj.setDisplaySlot(DisplaySlot.SIDEBAR);
         }
 
-        String title = color(applyPapi(player,
+        PlayerData data = plugin.getPlayerDataManager().get(player.getUniqueId());
+        if (data == null) data = new PlayerData();
+
+        String title = color(apply(player,
                 plugin.getConfigManager().getScoreboard().get().getString("title", "")
         ));
 
         obj.setDisplayName(title);
-
-        PlayerData data = plugin.getPlayerDataManager().get(player.getUniqueId());
-        if (data == null) data = new PlayerData();
 
         List<String> lines = plugin.getConfigManager()
                 .getScoreboard()
                 .get()
                 .getStringList("lines");
 
-        board.getEntries().forEach(board::resetScores);
-
         int score = lines.size();
 
-        for (String line : lines) {
-
-            line = line
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            String formatted = line
                     .replace("%kills%", String.valueOf(data.getKills()))
                     .replace("%deaths%", String.valueOf(data.getDeaths()))
                     .replace("%kdr%", String.format("%.2f", data.getKDR()))
                     .replace("%streak%", String.valueOf(data.getKillStreak()))
                     .replace("%coins%", String.valueOf(data.getCoins()));
 
-            line = color(applyPapi(player, line));
-
-            obj.getScore(line).setScore(score--);
+            formatted = color(apply(player, formatted));
+            formatted = formatted + ChatColor.values()[i % ChatColor.values().length];
+            obj.getScore(formatted).setScore(score--);
         }
     }
 
-    private String applyPapi(Player player, String text) {
+    private String apply(Player p, String text) {
         if (text == null) return "";
-        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            return PlaceholderAPI.setPlaceholders(player, text);
-        }
-        return text;
+        return Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")
+                ? PlaceholderAPI.setPlaceholders(p, text)
+                : text;
     }
 
     private String color(String text) {

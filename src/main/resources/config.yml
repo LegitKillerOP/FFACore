@@ -1,7 +1,7 @@
 mongodb:
   # MongoDB connection URI
-  uri: "mongodb+srv://legit:shauryam@minecraftservertest.xspyocf.mongodb.net/"
+  uri: "mongodb://localhost:27017"
   # Database name
   database: "minecraftservertest"
 
-chat: "&8[FFA] %luckperms_prefix%%player_name% &8» &f{message}"r
+chat: "&8[FFA] %luckperms_prefix%%player_name% &8» &f{message}"
