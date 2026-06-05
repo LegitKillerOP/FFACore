@@ -1,80 +1,56 @@
 package me.legit.ffacore.commands;
+
 import me.legit.ffacore.FFACore;
 import me.legit.ffacore.kits.Kit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import me.legit.ffacore.kits.KitCooldownManager;
+import org.bukkit.Sound;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class KitCommand implements CommandExecutor {
 
     private final FFACore plugin;
-    public KitCommand(FFACore plugin){
+    public KitCommand(FFACore plugin) {
         this.plugin = plugin;
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args){
-        if(!(sender instanceof Player))
-            return true;
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        if (!(sender instanceof Player)) return true;
         Player player = (Player) sender;
-        if(args.length == 0){
-            player.sendMessage(plugin.getPrefix() + "§c/kit <name>");
+
+        if (args.length == 0) {
+            plugin.getKitSelectorGUI().open(player);
             return true;
         }
+
         Kit kit = plugin.getKitManager().getKit(args[0]);
-        if(kit == null){
-            player.sendMessage(plugin.getPrefix() + "§cKit not found.");
+        if (kit == null) {
+            player.sendMessage("§cKit not found.");
+            player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1f, 1f);
             return true;
         }
 
-        String permission = kit.getPermission();
-        if (permission != null && !permission.trim().isEmpty() && !player.hasPermission(permission)){
-            player.sendMessage(plugin.getPrefix() + ChatColor.RED + "No permission.");
+        if (kit.getPermission() != null && !kit.getPermission().isEmpty()
+                && !player.hasPermission(kit.getPermission())) {
+
+            player.sendMessage("§cNo permission.");
+            player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1f, 1f);
             return true;
         }
 
-        player.getInventory().clear();
-        player.getInventory().setArmorContents(new ItemStack[4]);
-        for (ItemStack item : kit.getItems()) {
-            if (item == null) continue;
-            if (isHelmet(item.getType())) {
-                player.getInventory().setHelmet(item);
-                continue;
-            }
-            if (isChestplate(item.getType())) {
-                player.getInventory().setChestplate(item);
-                continue;
-            }
-            if (isLeggings(item.getType())) {
-                player.getInventory().setLeggings(item);
-                continue;
-            }
-            if (isBoots(item.getType())) {
-                player.getInventory().setBoots(item);
-                continue;
-            }
-            player.getInventory().addItem(item);
+        KitCooldownManager cd = plugin.getKitCooldownManager();
+
+        if (cd.isOnCooldown(kit.getName(), player.getUniqueId())) {
+            long sec = cd.getRemaining(kit.getName(), player.getUniqueId()) / 1000;
+            player.sendMessage("§cCooldown: §f" + sec + "s");
+            player.playSound(player.getLocation(), Sound.NOTE_BASS, 1f, 0.5f);
+            return true;
         }
-        player.sendMessage(plugin.getPrefix() + ChatColor.GREEN + "Selected " + kit.getName());
+
+        plugin.getKitManager().applyKit(player, kit);
+        cd.applyCooldown(kit.getName(), player.getUniqueId(), kit.getCooldownSeconds());
 
         return true;
-    }
-
-    private boolean isHelmet(Material type) {
-        return type == Material.LEATHER_HELMET || type == Material.CHAINMAIL_HELMET || type == Material.IRON_HELMET || type == Material.GOLD_HELMET || type == Material.DIAMOND_HELMET || type == Material.PUMPKIN;
-    }
-
-    private boolean isChestplate(Material type) {
-        return type == Material.LEATHER_CHESTPLATE || type == Material.CHAINMAIL_CHESTPLATE || type == Material.IRON_CHESTPLATE || type == Material.GOLD_CHESTPLATE || type == Material.DIAMOND_CHESTPLATE;
-    }
-
-    private boolean isLeggings(Material type) {
-        return type == Material.LEATHER_LEGGINGS || type == Material.CHAINMAIL_LEGGINGS || type == Material.IRON_LEGGINGS || type == Material.GOLD_LEGGINGS || type == Material.DIAMOND_LEGGINGS;
-    }
-
-    private boolean isBoots(Material type) {
-        return type == Material.LEATHER_BOOTS || type == Material.CHAINMAIL_BOOTS || type == Material.IRON_BOOTS || type == Material.GOLD_BOOTS || type == Material.DIAMOND_BOOTS;
     }
 }

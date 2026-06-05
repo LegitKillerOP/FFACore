@@ -8,8 +8,11 @@ import me.legit.ffacore.config.ConfigManager;
 import me.legit.ffacore.database.MongoDBHandler;
 import me.legit.ffacore.database.MongoDataStore;
 import me.legit.ffacore.database.MongoSaveTask;
+import me.legit.ffacore.gui.kitselector.KitSelectorGUI;
+import me.legit.ffacore.gui.kitselector.KitSelectorListener;
 import me.legit.ffacore.hologram.HologramListener;
 import me.legit.ffacore.hologram.HologramManager;
+import me.legit.ffacore.kits.KitCooldownManager;
 import me.legit.ffacore.kits.KitManager;
 import me.legit.ffacore.leaderboard.LeaderboardManager;
 import me.legit.ffacore.leaderboard.LeaderboardTask;
@@ -40,6 +43,9 @@ public class FFACore extends JavaPlugin {
     private TabManager tabManager;
     private LeaderboardManager leaderboardManager;
     private HologramManager hologramManager;
+    private KitCooldownManager kitCooldownManager;
+    private KitSelectorGUI kitSelectorGUI;
+    private KitSelectorListener kitSelectorListener;
 
     @Override
     public void onEnable() {
@@ -60,6 +66,9 @@ public class FFACore extends JavaPlugin {
         tabManager = new TabManager(this);
         leaderboardManager = new LeaderboardManager(this);
         hologramManager = new HologramManager(this);
+        kitCooldownManager = new KitCooldownManager();
+        kitSelectorGUI = new KitSelectorGUI(this);
+        kitSelectorListener = new KitSelectorListener(this);
 
         new ScoreboardTask(this).runTaskTimer(this, 20L, 20L);
         new LeaderboardTask(this).runTaskTimer(this, 20L, 200L);
@@ -75,6 +84,7 @@ public class FFACore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new DeathListener(this),this);
         getServer().getPluginManager().registerEvents(new HologramListener(this),this);
         getServer().getPluginManager().registerEvents(new ServerProtectionListener(this), this);
+        getServer().getPluginManager().registerEvents(kitSelectorListener, this);
 
         getCommand("ffa").setExecutor(new FFACoreCommand(this));
         getCommand("spawn").setExecutor(new SpawnCommand(this));
@@ -164,4 +174,11 @@ public class FFACore extends JavaPlugin {
         return hologramManager;
     }
 
+    public KitCooldownManager getKitCooldownManager() {
+        return kitCooldownManager;
+    }
+
+    public KitSelectorGUI getKitSelectorGUI() {
+        return kitSelectorGUI;
+    }
 }

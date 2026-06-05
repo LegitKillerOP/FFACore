@@ -1,4 +1,53 @@
 kits:
+  default:
+    permission: ""
+    items:
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: IRON_SWORD
+        enchants:
+          DAMAGE_ALL: 2
+          DURABILITY: 2
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: FISHING_ROD
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: BOW
+        enchants:
+          ARROW_DAMAGE: 2
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: ARROW
+        amount: 16
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: GOLDEN_APPLE
+        amount: 5
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: IRON_HELMET
+        enchants:
+          PROTECTION_ENVIRONMENTAL: 2
+          DURABILITY: 2
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: IRON_CHESTPLATE
+        enchants:
+          PROTECTION_ENVIRONMENTAL: 2
+          DURABILITY: 2
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: IRON_LEGGINGS
+        enchants:
+          PROTECTION_ENVIRONMENTAL: 2
+          DURABILITY: 2
+
+      - ==: org.bukkit.inventory.ItemStack
+        type: IRON_BOOTS
+        enchants:
+          PROTECTION_ENVIRONMENTAL: 2
+          DURABILITY: 2
 
   warrior:
     permission: ffa.kit.warrior
