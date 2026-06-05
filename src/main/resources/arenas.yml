@@ -1,1 +1,18 @@
-arenas: {}
+arenas:
+  arena1:
+    name: arena1
+    min:
+      world: world
+      x: 0.0
+      y: 40.0
+      z: 0.0
+      yaw: -180.0
+      pitch: 0.0
+    max:
+      world: world
+      x: 50.0
+      y: 120.0
+      z: -50.0
+      yaw: -180.0
+      pitch: 2.0
+active: arena1

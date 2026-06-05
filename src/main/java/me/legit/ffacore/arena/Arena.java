@@ -9,14 +9,12 @@ public class Arena {
 
     private final String name;
 
-    private boolean enabled;
+    private boolean enabled = true;
 
     private Location min;
     private Location max;
 
-    private final List<Location> spawns = new ArrayList<>();
-
-    public Arena(String name){
+    public Arena(String name) {
         this.name = name;
     }
 
@@ -46,10 +44,6 @@ public class Arena {
 
     public void setMax(Location max) {
         this.max = max;
-    }
-
-    public List<Location> getSpawns() {
-        return spawns;
     }
 
 }

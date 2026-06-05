@@ -12,24 +12,27 @@ commands:
   ffa:
     description: FFACore admin command
     usage: /ffa reload
+    permission: ffacore.admin
   spawn:
     description: Teleport to spawn
     usage: /spawn
   setspawn:
     description: Set spawn location
     usage: /setspawn
+    permission: ffacore.admin
   arena:
-    description: Arena management
-    usage: /arena create <name>
+    description: Manage FFA arenas
+    usage: /arena <create|join|delete|setmin|setmax|setactive|list>
+    permission: ffacore.admin
   kit:
     description: Select kit
     usage: /kit <kitname>
   kitadmin:
     description: Admin kit GUI
     usage: /kitadmin
+    permission: ffacore.admin
   leaderboard:
     description: Manage holographic leaderboards
     usage: /leaderboard <add|movehere|reload|remove|list|update>
-  lb:
-    description: Short alias for /leaderboard
-    usage: /lb <add|movehere|reload|remove|list|update>
+    permission: ffacore.admin
+    aliases: lb

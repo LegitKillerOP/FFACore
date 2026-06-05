@@ -5,17 +5,24 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
-import org.bukkit.event.weather.*;
 import org.bukkit.event.player.*;
+import org.bukkit.event.block.*;
+import org.bukkit.event.weather.*;
 
 public class ServerProtectionListener implements Listener {
 
     private final FFACore plugin;
 
+    private final String mode;
+    private final String arenaWorld;
+
     public ServerProtectionListener(FFACore plugin) {
         this.plugin = plugin;
+
+        this.mode = plugin.getConfig().getString("server-mode.type", "TWO_WORLD");
+        this.arenaWorld = plugin.getConfig().getString("worlds.arena", "world");
+
         setupWorldRules();
     }
 
@@ -37,181 +44,89 @@ public class ServerProtectionListener implements Listener {
         plugin.getLogger().info("FFA server protection initialized.");
     }
 
-    private boolean isArenaContext(Location loc) {
-        String mode = plugin.getConfig().getString("server-mode.type", "TWO_WORLD");
+    private boolean isArena(Location loc) {
 
-        switch (mode.toUpperCase()) {
+        if (loc == null || loc.getWorld() == null) return false;
 
-            case "ONE_WORLD":
-                return true;
+        String world = loc.getWorld().getName();
 
-            case "TWO_WORLD":
-                String arenaWorld = plugin.getConfig().getString("worlds.arena", "world");
-                return loc.getWorld().getName().equalsIgnoreCase(arenaWorld);
-
-            case "REGION":
-                return isInRegion(loc);
-
-            default:
-                return false;
+        if (mode.equalsIgnoreCase("ONE_WORLD")) {
+            return true;
         }
+
+        if (mode.equalsIgnoreCase("TWO_WORLD")) {
+            return world.equalsIgnoreCase(arenaWorld);
+        }
+
+        if (mode.equalsIgnoreCase("REGION")) {
+            return isInRegion(loc);
+        }
+
+        return false;
     }
 
     private boolean isInRegion(Location loc) {
 
         String worldName = plugin.getConfig().getString("region.world");
+        if (worldName == null) return false;
 
-        if (worldName == null || loc == null || loc.getWorld() == null) {
-            return false;
-        }
-
-        if (!loc.getWorld().getName().equalsIgnoreCase(worldName)) {
-            return false;
-        }
+        if (!loc.getWorld().getName().equalsIgnoreCase(worldName)) return false;
 
         int x = loc.getBlockX();
         int y = loc.getBlockY();
         int z = loc.getBlockZ();
 
-        int minX = plugin.getConfig().getInt("region.min.x");
-        int minY = plugin.getConfig().getInt("region.min.y");
-        int minZ = plugin.getConfig().getInt("region.min.z");
-
-        int maxX = plugin.getConfig().getInt("region.max.x");
-        int maxY = plugin.getConfig().getInt("region.max.y");
-        int maxZ = plugin.getConfig().getInt("region.max.z");
-
-        return x >= minX && x <= maxX
-                && y >= minY && y <= maxY
-                && z >= minZ && z <= maxZ;
+        return x >= plugin.getConfig().getInt("region.min.x")
+                && x <= plugin.getConfig().getInt("region.max.x")
+                && y >= plugin.getConfig().getInt("region.min.y")
+                && y <= plugin.getConfig().getInt("region.max.y")
+                && z >= plugin.getConfig().getInt("region.min.z")
+                && z <= plugin.getConfig().getInt("region.max.z");
     }
+
+    // ---------------- PLAYER PROTECTION ----------------
 
     @EventHandler
     public void onHunger(FoodLevelChangeEvent e) {
+        if (e.getEntity() instanceof Player && isArena(e.getEntity().getLocation())) {
+            e.setCancelled(true);
+            ((Player) e.getEntity()).setFoodLevel(20);
+        }
+    }
+
+    @EventHandler
+    public void onDamage(EntityDamageEvent e) {
         if (!(e.getEntity() instanceof Player)) return;
 
-        Player p = (Player) e.getEntity();
-        if (!isArenaContext(p.getLocation())) return;
-
-        e.setCancelled(true);
-        p.setFoodLevel(20);
-        p.setSaturation(20f);
-    }
-
-    @EventHandler
-    public void onRegen(EntityRegainHealthEvent e) {
-        if (!(e.getEntity() instanceof Player)) return;
-
-        Player p = (Player) e.getEntity();
-        if (!isArenaContext(p.getLocation())) return;
-
-        e.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onDrop(PlayerDropItemEvent e) {
-        if (!isArenaContext(e.getPlayer().getLocation())) return;
-        e.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onPickup(PlayerPickupItemEvent e) {
-        if (!isArenaContext(e.getPlayer().getLocation())) return;
-        e.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onBreak(BlockBreakEvent e) {
-        if (!isArenaContext(e.getBlock().getLocation())) return;
-        e.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onPlace(BlockPlaceEvent e) {
-        if (!isArenaContext(e.getBlock().getLocation())) return;
-        e.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onPhysics(BlockPhysicsEvent e) {
-        if (!isArenaContext(e.getBlock().getLocation())) return;
-        e.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onSpread(BlockSpreadEvent e) {
-        if (!isArenaContext(e.getBlock().getLocation())) return;
-        e.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onLeaves(LeavesDecayEvent e) {
-        if (!isArenaContext(e.getBlock().getLocation())) return;
-        e.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onBurn(BlockBurnEvent e) {
-        if (!isArenaContext(e.getBlock().getLocation())) return;
-        e.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onWeather(WeatherChangeEvent e) {
-        if (!isArenaContext(e.getWorld().getSpawnLocation())) return;
-
-        if (e.toWeatherState()) {
+        if (isArena(e.getEntity().getLocation())
+                && e.getCause() == EntityDamageEvent.DamageCause.FALL) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void onThunder(ThunderChangeEvent e) {
-        if (!isArenaContext(e.getWorld().getSpawnLocation())) return;
+    public void onBlock(BlockPlaceEvent e) {
+        if (isArena(e.getPlayer().getLocation())) e.setCancelled(true);
+    }
 
-        if (e.toThunderState()) {
-            e.setCancelled(true);
+    @EventHandler
+    public void onBreak(BlockBreakEvent e) {
+        if (isArena(e.getPlayer().getLocation())) e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onWeather(WeatherChangeEvent e) {
+        if (isArena(e.getWorld().getSpawnLocation())) {
+            e.setCancelled(e.toWeatherState());
         }
     }
 
     @EventHandler
     public void onSpawn(CreatureSpawnEvent e) {
-        if (!isArenaContext(e.getLocation())) return;
-
-        if (e.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL
-                || e.getSpawnReason() == CreatureSpawnEvent.SpawnReason.CHUNK_GEN) {
-            e.setCancelled(true);
+        if (isArena(e.getLocation())) {
+            if (e.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
+                e.setCancelled(true);
+            }
         }
-    }
-
-    @EventHandler
-    public void onExplosion(EntityExplodeEvent e) {
-        if (!isArenaContext(e.getLocation())) return;
-        e.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onDamage(EntityDamageEvent e) {
-
-        if (!(e.getEntity() instanceof Player)) return;
-
-        Player p = (Player) e.getEntity();
-        if (!isArenaContext(p.getLocation())) return;
-
-        if (e.getCause() == EntityDamageEvent.DamageCause.FALL) {
-            e.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void onInteract(PlayerInteractEvent e) {
-        if (!isArenaContext(e.getPlayer().getLocation())) return;
-        e.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onBucket(PlayerBucketEmptyEvent e) {
-        if (!isArenaContext(e.getPlayer().getLocation())) return;
-        e.setCancelled(true);
     }
 }
