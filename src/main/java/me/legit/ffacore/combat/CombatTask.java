@@ -22,11 +22,11 @@ public class CombatTask extends BukkitRunnable {
         CombatManager combat = plugin.getCombatManager();
         combat.cleanup();
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (!combat.isTagged(player.getUniqueId())) continue;
-            int time = combat.getRemaining(player.getUniqueId());
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (!combat.isTagged(p.getUniqueId())) continue;
+            int time = combat.getRemaining(p.getUniqueId());
             if (time <= 0) continue;
-            sendActionBar(player, color("&c⚔ Combat Tag: &f" + time + "s"));
+            sendActionBar(p,"§cCombat: §f" + time + "s");
         }
     }
 

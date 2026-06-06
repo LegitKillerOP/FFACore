@@ -14,15 +14,8 @@ public class ServerProtectionListener implements Listener {
 
     private final FFACore plugin;
 
-    private final String mode;
-    private final String arenaWorld;
-
     public ServerProtectionListener(FFACore plugin) {
         this.plugin = plugin;
-
-        this.mode = plugin.getConfig().getString("server-mode.type", "TWO_WORLD");
-        this.arenaWorld = plugin.getConfig().getString("worlds.arena", "world");
-
         setupWorldRules();
     }
 
@@ -44,44 +37,43 @@ public class ServerProtectionListener implements Listener {
         plugin.getLogger().info("FFA server protection initialized.");
     }
 
-    private boolean isArena(Location loc) {
-
-        if (loc == null || loc.getWorld() == null) return false;
-
-        String world = loc.getWorld().getName();
-
-        if (mode.equalsIgnoreCase("ONE_WORLD")) {
-            return true;
-        }
-
-        if (mode.equalsIgnoreCase("TWO_WORLD")) {
-            return world.equalsIgnoreCase(arenaWorld);
-        }
-
-        if (mode.equalsIgnoreCase("REGION")) {
-            return isInRegion(loc);
-        }
-
-        return false;
+    public boolean isArena(Location loc) {
+        return plugin.getArenaManager().isInArena(loc);
     }
 
-    private boolean isInRegion(Location loc) {
+    public boolean canPvP(Location loc) {
+        return isArena(loc);
+    }
 
-        String worldName = plugin.getConfig().getString("region.world");
-        if (worldName == null) return false;
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityDamage(EntityDamageEvent e) {
+        if (!(e.getEntity() instanceof Player)) return;
+        Player p = (Player) e.getEntity();
+        if (!isArena(p.getLocation())) {
+            e.setCancelled(true);
+            return;
+        }
+    }
 
-        if (!loc.getWorld().getName().equalsIgnoreCase(worldName)) return false;
+    @EventHandler(ignoreCancelled = true)
+    public void onProjectile(EntityDamageByEntityEvent e) {
+        if (!(e.getEntity() instanceof Player)) return;
+        if (!(e.getDamager() instanceof Player)) return;
+        Player victim = (Player) e.getEntity();
+        Player attacker = (Player) e.getDamager();
+        boolean victimInArena = isArena(victim.getLocation());
+        boolean attackerInArena = isArena(attacker.getLocation());
+        if (!victimInArena || !attackerInArena) {
+            e.setCancelled(true);
+        }
+    }
 
-        int x = loc.getBlockX();
-        int y = loc.getBlockY();
-        int z = loc.getBlockZ();
-
-        return x >= plugin.getConfig().getInt("region.min.x")
-                && x <= plugin.getConfig().getInt("region.max.x")
-                && y >= plugin.getConfig().getInt("region.min.y")
-                && y <= plugin.getConfig().getInt("region.max.y")
-                && z >= plugin.getConfig().getInt("region.min.z")
-                && z <= plugin.getConfig().getInt("region.max.z");
+    @EventHandler(ignoreCancelled = true)
+    public void onRod(PlayerFishEvent e) {
+        Player p = e.getPlayer();
+        if (!isArena(p.getLocation())) {
+            e.setCancelled(true);
+        }
     }
 
     // ---------------- PLAYER PROTECTION ----------------

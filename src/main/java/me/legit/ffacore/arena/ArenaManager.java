@@ -142,6 +142,31 @@ public class ArenaManager {
         return true;
     }
 
+    public boolean isInArena(Location loc) {
+        Arena arena = getActiveArena();
+        if (arena == null || arena.getMin() == null || arena.getMax() == null) {
+            return false;
+        }
+
+        if (loc == null || loc.getWorld() == null) return false;
+        if (!loc.getWorld().equals(arena.getMin().getWorld())) return false;
+
+        int x = loc.getBlockX();
+        int y = loc.getBlockY();
+        int z = loc.getBlockZ();
+
+        int minX = Math.min(arena.getMin().getBlockX(), arena.getMax().getBlockX());
+        int maxX = Math.max(arena.getMin().getBlockX(), arena.getMax().getBlockX());
+        int minY = Math.min(arena.getMin().getBlockY(), arena.getMax().getBlockY());
+        int maxY = Math.max(arena.getMin().getBlockY(), arena.getMax().getBlockY());
+        int minZ = Math.min(arena.getMin().getBlockZ(), arena.getMax().getBlockZ());
+        int maxZ = Math.max(arena.getMin().getBlockZ(), arena.getMax().getBlockZ());
+
+        return x >= minX && x <= maxX
+                && y >= minY && y <= maxY
+                && z >= minZ && z <= maxZ;
+    }
+
     // ------------------------
     // SAVE / LOAD SYSTEM (FIX)
     // ------------------------

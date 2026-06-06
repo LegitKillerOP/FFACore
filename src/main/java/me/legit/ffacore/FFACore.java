@@ -46,6 +46,7 @@ public class FFACore extends JavaPlugin {
     private KitCooldownManager kitCooldownManager;
     private KitSelectorGUI kitSelectorGUI;
     private KitSelectorListener kitSelectorListener;
+    private ServerProtectionListener serverProtectionListener;
 
     @Override
     public void onEnable() {
@@ -69,6 +70,7 @@ public class FFACore extends JavaPlugin {
         kitCooldownManager = new KitCooldownManager();
         kitSelectorGUI = new KitSelectorGUI(this);
         kitSelectorListener = new KitSelectorListener(this);
+        serverProtectionListener = new ServerProtectionListener(this);
 
         new ScoreboardTask(this).runTaskTimer(this, 20L, 20L);
         new LeaderboardTask(this).runTaskTimer(this, 20L, 200L);
@@ -180,5 +182,9 @@ public class FFACore extends JavaPlugin {
 
     public KitSelectorGUI getKitSelectorGUI() {
         return kitSelectorGUI;
+    }
+
+    public ServerProtectionListener getServerProtectionListener() {
+        return serverProtectionListener;
     }
 }
