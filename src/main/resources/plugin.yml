@@ -36,3 +36,7 @@ commands:
     usage: /leaderboard <add|movehere|reload|remove|list|update>
     permission: ffacore.admin
     aliases: lb
+  killstreak:
+    description: See your current kill streak
+    usage: /killstreak
+    aliases: ks

@@ -3,6 +3,7 @@ package me.legit.ffacore;
 import me.legit.ffacore.arena.ArenaManager;
 import me.legit.ffacore.combat.CombatManager;
 import me.legit.ffacore.combat.CombatTask;
+import me.legit.ffacore.combat.KillManager;
 import me.legit.ffacore.commands.*;
 import me.legit.ffacore.config.ConfigManager;
 import me.legit.ffacore.database.MongoDBHandler;
@@ -39,6 +40,7 @@ public class FFACore extends JavaPlugin {
     private ArenaManager arenaManager;
     private KitManager kitManager;
     private CombatManager combatManager;
+    private KillManager killManager;
 
     private ScoreboardManager scoreboardManager;
     private TabManager tabManager;
@@ -49,6 +51,7 @@ public class FFACore extends JavaPlugin {
     private KitSelectorGUI kitSelectorGUI;
 
     private ServerProtectionListener serverProtectionListener;
+    private ChatListener chatListener;
 
     @Override
     public void onEnable() {
@@ -87,6 +90,7 @@ public class FFACore extends JavaPlugin {
         arenaManager = new ArenaManager(this);
         kitManager = new KitManager(this);
         combatManager = new CombatManager(15);
+        killManager = new KillManager(this);
 
         scoreboardManager = new ScoreboardManager(this);
         tabManager = new TabManager(this);
@@ -102,6 +106,7 @@ public class FFACore extends JavaPlugin {
 
     private void initListeners() {
         serverProtectionListener = new ServerProtectionListener(this);
+        chatListener = new ChatListener(this);
 
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new ChatListener(this), this);
@@ -112,6 +117,7 @@ public class FFACore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new HologramListener(this), this);
         getServer().getPluginManager().registerEvents(new KitSelectorListener(this), this);
         getServer().getPluginManager().registerEvents(serverProtectionListener, this);
+        getServer().getPluginManager().registerEvents(chatListener, this);
     }
 
     private void initCommands() {
@@ -123,6 +129,7 @@ public class FFACore extends JavaPlugin {
         getCommand("leaderboard").setExecutor(new LeaderboardCommand(this));
         getCommand("lb").setExecutor(new LeaderboardCommand(this));
         getCommand("kitadmin").setExecutor(new KitAdminCommand(this));
+        getCommand("killstreak").setExecutor(new KillStreakCommand(this));
     }
 
     private void initTasks() {
@@ -160,6 +167,12 @@ public class FFACore extends JavaPlugin {
     public KitCooldownManager getKitCooldownManager() { return kitCooldownManager; }
     public KitSelectorGUI getKitSelectorGUI() { return kitSelectorGUI; }
     public ServerProtectionListener getServerProtectionListener() { return serverProtectionListener; }
+    public KillManager getKillManager() {
+        return killManager;
+    }
+    public ChatListener getChatListener() {
+        return chatListener;
+    }
 
     public void log(String msg) {
         getLogger().info(msg);

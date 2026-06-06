@@ -4,13 +4,21 @@ import me.legit.ffacore.FFACore;
 import me.legit.ffacore.player.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class DeathListener implements Listener {
@@ -25,26 +33,14 @@ public class DeathListener implements Listener {
     public void onDeath(PlayerDeathEvent e) {
         e.setDeathMessage(null);
         Player victim = e.getEntity();
-        Player killer = victim.getKiller();
-        PlayerData victimData = plugin.getPlayerDataManager().get(victim.getUniqueId());
-        if (victimData != null) {
-            victimData.addDeath();
-        }
-        if (killer != null) {
-            PlayerData killerData = plugin.getPlayerDataManager().get(killer.getUniqueId());
-            if (killerData != null) {
-                killerData.addKill();
-                int streak = killerData.getKillStreak();
-                killer.sendMessage(plugin.getPrefix() + ChatColor.GREEN + "+1 Kill");
-                victim.sendMessage(plugin.getPrefix() + ChatColor.RED + "Killed by " + killer.getName());
-                if (streak > 0 && streak % 5 == 0) {
-                    Bukkit.broadcastMessage(ChatColor.GOLD + killer.getName()
-                            + " is on a " + streak + " kill streak!");
-                }
-            }
-            sendRandomKillMessage(victim, killer);
-        }
-        plugin.getCombatManager().remove(victim.getUniqueId());
+        UUID realKillerId = victim.getKiller() != null
+                ? victim.getKiller().getUniqueId()
+                : plugin.getCombatManager().getLastHit(victim.getUniqueId());
+        Player killer = realKillerId != null ? Bukkit.getPlayer(realKillerId) : null;
+
+        plugin.getKillManager().handleKill(victim, killer);
+        sendRandomKillMessage(victim, killer);
+
         new BukkitRunnable() {
             @Override
             public void run() {

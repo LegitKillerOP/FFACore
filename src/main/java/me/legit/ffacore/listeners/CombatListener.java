@@ -1,7 +1,10 @@
 package me.legit.ffacore.listeners;
 
 import me.legit.ffacore.FFACore;
+import net.minecraft.server.v1_8_R3.ChatComponentText;
+import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import org.bukkit.*;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.*;
@@ -24,24 +27,49 @@ public class CombatListener implements Listener {
     public void onDamage(EntityDamageByEntityEvent e) {
         if (!(e.getEntity() instanceof Player)) return;
         if (!(e.getDamager() instanceof Player)) return;
+
         Player victim = (Player) e.getEntity();
         Player attacker = (Player) e.getDamager();
+
         boolean victimInArena = plugin.getServerProtectionListener().isArena(victim.getLocation());
         boolean attackerInArena = plugin.getServerProtectionListener().isArena(attacker.getLocation());
 
+        // Anti-clean protection
+        if (plugin.getCombatManager().hasProtection(victim.getUniqueId())) {
+            e.setCancelled(true);
+            attacker.sendMessage("§cThat player has spawn protection!");
+            return;
+        }
+
+        // Arena check
         if (!victimInArena || !attackerInArena) {
             e.setCancelled(true);
+
             if (!attackerInArena) {
                 attacker.sendMessage("§cYou must be inside the arena to attack!");
             } else {
                 attacker.sendMessage("§cYou can only hit players inside the arena!");
             }
+
             attacker.playSound(attacker.getLocation(), Sound.VILLAGER_NO, 1f, 1f);
             return;
         }
 
         if (victim.equals(attacker)) return;
 
+        // Combo system
+        int combo = plugin.getCombatManager().addCombo(attacker.getUniqueId(), victim.getUniqueId());
+        double damage = e.getFinalDamage();
+
+        String msg = "§c-" + String.format("%.1f", damage / 2) + " ❤";
+        if (combo > 1) {
+            msg += " §7| §eCombo: §6" + combo + "x";
+        }
+
+        sendActionBar(attacker, msg);
+        attacker.playSound(attacker.getLocation(), Sound.NOTE_PLING, 1f, 1.5f);
+
+        // Combat tagging
         plugin.getCombatManager().tag(victim.getUniqueId());
         plugin.getCombatManager().tag(attacker.getUniqueId());
 
@@ -57,29 +85,19 @@ public class CombatListener implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
         Player victim = e.getEntity();
-        Player killer = victim.getKiller();
         UUID victimId = victim.getUniqueId();
-        UUID realKiller = null;
 
-        if (killer != null) {
-            realKiller = killer.getUniqueId();
-        } else {
-            UUID last = plugin.getCombatManager().getLastHit(victimId);
-            if (last != null) realKiller = last;
-        }
+        UUID realKiller = victim.getKiller() != null
+                ? victim.getKiller().getUniqueId()
+                : plugin.getCombatManager().getLastHit(victimId);
 
+        // Reset combos
+        plugin.getCombatManager().resetCombo(victimId);
         if (realKiller != null) {
-            Player k = Bukkit.getPlayer(realKiller);
-            if (k != null) {
-                plugin.getPlayerDataManager().get(realKiller).addKill();
-                plugin.getPlayerDataManager().get(realKiller).addCoins(5);
-                plugin.getPlayerDataManager().get(realKiller).addXp(10);
-
-                k.sendMessage("§a+1 Kill §7(§e+5 coins§7)");
-                k.playSound(k.getLocation(), Sound.LEVEL_UP, 1f, 1.2f);
-            }
+            plugin.getCombatManager().resetCombo(realKiller);
         }
 
+        // Assist system ONLY
         UUID assister = plugin.getCombatManager().getTopAssister(victimId, realKiller);
         if (assister != null) {
             Player a = Bukkit.getPlayer(assister);
@@ -132,6 +150,14 @@ public class CombatListener implements Listener {
         messageCooldown.put(p.getUniqueId(), now);
 
         p.sendMessage("§cCombat Tagged §7(15s)");
+    }
+
+    private void sendActionBar(Player player, String message) {
+        PacketPlayOutChat packet = new PacketPlayOutChat(
+                new ChatComponentText(message),
+                (byte) 2
+        );
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
     }
 
     private void playTagSound(Player p) {
