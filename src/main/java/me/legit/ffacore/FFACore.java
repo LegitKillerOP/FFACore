@@ -29,65 +29,92 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class FFACore extends JavaPlugin {
 
     private static FFACore instance;
+
     private ConfigManager configManager;
     private MongoDBHandler mongoDBHandler;
     private MongoDataStore mongoDataStore;
+
     private PlayerDataManager playerDataManager;
-    private ChatListener chatListener;
-    private GUIListener guiListener;
     private SpawnManager spawnManager;
     private ArenaManager arenaManager;
     private KitManager kitManager;
     private CombatManager combatManager;
+
     private ScoreboardManager scoreboardManager;
     private TabManager tabManager;
     private LeaderboardManager leaderboardManager;
     private HologramManager hologramManager;
+
     private KitCooldownManager kitCooldownManager;
     private KitSelectorGUI kitSelectorGUI;
-    private KitSelectorListener kitSelectorListener;
+
     private ServerProtectionListener serverProtectionListener;
 
     @Override
     public void onEnable() {
         instance = this;
+
+        initCore();
+        initManagers();
+        initGUI();
+        initListeners();
+        initCommands();
+        initTasks();
+
+        log("FFACore enabled");
+    }
+
+    @Override
+    public void onDisable() {
+        shutdown();
+        log("FFACore disabled");
+    }
+
+    // ------------------------
+    // INIT SECTIONS
+    // ------------------------
+
+    private void initCore() {
         configManager = new ConfigManager(this);
         mongoDBHandler = new MongoDBHandler(this);
         mongoDBHandler.connect();
         mongoDataStore = new MongoDataStore(this);
-        
+    }
+
+    private void initManagers() {
         playerDataManager = new PlayerDataManager(this);
-        chatListener = new ChatListener(this);
-        guiListener = new GUIListener(this);
         spawnManager = new SpawnManager(this);
         arenaManager = new ArenaManager(this);
         kitManager = new KitManager(this);
         combatManager = new CombatManager(15);
+
         scoreboardManager = new ScoreboardManager(this);
         tabManager = new TabManager(this);
         leaderboardManager = new LeaderboardManager(this);
         hologramManager = new HologramManager(this);
+
         kitCooldownManager = new KitCooldownManager();
+    }
+
+    private void initGUI() {
         kitSelectorGUI = new KitSelectorGUI(this);
-        kitSelectorListener = new KitSelectorListener(this);
+    }
+
+    private void initListeners() {
         serverProtectionListener = new ServerProtectionListener(this);
 
-        new ScoreboardTask(this).runTaskTimer(this, 20L, 20L);
-        new LeaderboardTask(this).runTaskTimer(this, 20L, 200L);
-        new MongoSaveTask(this).runTaskTimer(this, 6000L, 6000L);  // Save every 5 minutes
-        tabManager.startTabUpdater();
-        new CombatTask(this).runTaskTimer(this, 0L, 20L);
-
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
-        getServer().getPluginManager().registerEvents(chatListener, this);
-        getServer().getPluginManager().registerEvents(guiListener, this);
+        getServer().getPluginManager().registerEvents(new ChatListener(this), this);
+        getServer().getPluginManager().registerEvents(new GUIListener(this), this);
         getServer().getPluginManager().registerEvents(new SpawnListener(this), this);
         getServer().getPluginManager().registerEvents(new CombatListener(this), this);
-        getServer().getPluginManager().registerEvents(new DeathListener(this),this);
-        getServer().getPluginManager().registerEvents(new HologramListener(this),this);
-        getServer().getPluginManager().registerEvents(new ServerProtectionListener(this), this);
-        getServer().getPluginManager().registerEvents(kitSelectorListener, this);
+        getServer().getPluginManager().registerEvents(new DeathListener(this), this);
+        getServer().getPluginManager().registerEvents(new HologramListener(this), this);
+        getServer().getPluginManager().registerEvents(new KitSelectorListener(this), this);
+        getServer().getPluginManager().registerEvents(serverProtectionListener, this);
+    }
 
+    private void initCommands() {
         getCommand("ffa").setExecutor(new FFACoreCommand(this));
         getCommand("spawn").setExecutor(new SpawnCommand(this));
         getCommand("setspawn").setExecutor(new SetSpawnCommand(this));
@@ -96,95 +123,49 @@ public class FFACore extends JavaPlugin {
         getCommand("leaderboard").setExecutor(new LeaderboardCommand(this));
         getCommand("lb").setExecutor(new LeaderboardCommand(this));
         getCommand("kitadmin").setExecutor(new KitAdminCommand(this));
-
-        log("FFACore enabled");
     }
 
-    @Override
-    public void onDisable() {
+    private void initTasks() {
+        new ScoreboardTask(this).runTaskTimer(this, 20L, 20L);
+        new LeaderboardTask(this).runTaskTimer(this, 20L, 200L);
+        new MongoSaveTask(this).runTaskTimer(this, 6000L, 6000L);
+        new CombatTask(this).runTaskTimer(this, 0L, 20L);
+
+        tabManager.startTabUpdater();
+    }
+
+    private void shutdown() {
         playerDataManager.saveAll();
         configManager.saveAll();
         mongoDBHandler.disconnect();
-        log("FFACore disabled");
     }
 
-    public static FFACore getInstance() {
-        return instance;
-    }
+    // ------------------------
+    // GETTERS
+    // ------------------------
 
-    public void log(String message) {
-        getLogger().info(message);
+    public static FFACore getInstance() { return instance; }
+    public ConfigManager getConfigManager() { return configManager; }
+    public MongoDBHandler getMongoDBHandler() { return mongoDBHandler; }
+    public MongoDataStore getMongoDataStore() { return mongoDataStore; }
+    public PlayerDataManager getPlayerDataManager() { return playerDataManager; }
+    public SpawnManager getSpawnManager() { return spawnManager; }
+    public ArenaManager getArenaManager() { return arenaManager; }
+    public KitManager getKitManager() { return kitManager; }
+    public CombatManager getCombatManager() { return combatManager; }
+    public ScoreboardManager getScoreboardManager() { return scoreboardManager; }
+    public LeaderboardManager getLeaderboardManager() { return leaderboardManager; }
+    public TabManager getTabManager() { return tabManager; }
+    public HologramManager getHologramManager() { return hologramManager; }
+    public KitCooldownManager getKitCooldownManager() { return kitCooldownManager; }
+    public KitSelectorGUI getKitSelectorGUI() { return kitSelectorGUI; }
+    public ServerProtectionListener getServerProtectionListener() { return serverProtectionListener; }
+
+    public void log(String msg) {
+        getLogger().info(msg);
     }
 
     public String getPrefix() {
         return "§8[§x§0§0§A§A§F§F§lF§x§0§0§C§C§F§F§lF§x§0§0§E§E§F§F§lA§8] §7";
-    }
-
-    public ConfigManager getConfigManager() {
-        return configManager;
-    }
-
-    public MongoDBHandler getMongoDBHandler() {
-        return mongoDBHandler;
-    }
-
-    public MongoDataStore getMongoDataStore() {
-        return mongoDataStore;
-    }
-
-    public ChatListener getChatListener() {
-        return chatListener;
-    }
-
-    public GUIListener getGuiListener() {
-        return guiListener;
-    }
-
-    public PlayerDataManager getPlayerDataManager() {
-        return playerDataManager;
-    }
-
-    public SpawnManager getSpawnManager() {
-        return spawnManager;
-    }
-
-    public ArenaManager getArenaManager(){
-        return arenaManager;
-    }
-
-    public KitManager getKitManager(){
-        return kitManager;
-    }
-
-    public CombatManager getCombatManager() {
-        return combatManager;
-    }
-
-    public ScoreboardManager getScoreboardManager() {
-        return scoreboardManager;
-    }
-
-    public LeaderboardManager getLeaderboardManager() {
-        return leaderboardManager;
-    }
-
-    public TabManager getTabManager() {
-        return tabManager;
-    }
-
-    public HologramManager getHologramManager() {
-        return hologramManager;
-    }
-
-    public KitCooldownManager getKitCooldownManager() {
-        return kitCooldownManager;
-    }
-
-    public KitSelectorGUI getKitSelectorGUI() {
-        return kitSelectorGUI;
-    }
-
-    public ServerProtectionListener getServerProtectionListener() {
-        return serverProtectionListener;
     }
 }
